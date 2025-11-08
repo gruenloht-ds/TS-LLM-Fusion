@@ -28,7 +28,25 @@ TS-LLM-Fusion/
 
 This section details how to run code in this repository and recreate results.
 
-#### Download Datasets
+### Environment
+
+1. First create a python venv, and install the requirements
+
+```bash
+python -m venv ~/.venvs/ts_llm
+source ~/.venvs/ts_llm
+pip install -r requirements.txt
+```
+
+2. Install packages in editable model
+
+To make all fucntions and modules inside of `src/` accessible as a python package, run:
+
+```bash
+pip install -e .
+```
+
+### Download Datasets
 
 ```bash
 wget ...
