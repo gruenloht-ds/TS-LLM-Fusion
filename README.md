@@ -18,10 +18,26 @@ Our goal is to understand, implement, and experiment with ideas from these paper
 ## Project Structure
 ```
 TS-LLM-Fusion/
-├── data/                # Store datasets
-├── models/              # Model architectures or wrappers
-├── experiments/         # Training scripts, evaluation
-└── src/                 # Helper functions, preprocessing, custom modules, etc.
+├── configs              # .yaml files specifying architectures and data paths
+│   ├── model.yaml
+│   └── path.yaml
+├── data                 # folder to keep all the real and synthetic data to benchmark
+│   ├── real
+│   └── synthetic
+├── models               # store trained models
+├── notebooks            # code for testing
+├── results              # results from runs or experiments
+├── setup.py
+└── src                  # code to build out this project, dataloaders, architecutres, data generation/pulling
+    ├── README.md
+    └── ts_llm_fusion
+        ├── core         # loading configs, saving logs
+        ├── data         # code for getting the data
+        ├── llm_ps       # code for creating modules from the LLM-PS paper
+        ├── models       # other model architecutres
+        ├── synthetic    # generating synthetic data
+        ├── tslm         # code for creating modules from the OpenTSLM paper
+        └── utils        # random useful functions
 ```
 
 ## Setup
