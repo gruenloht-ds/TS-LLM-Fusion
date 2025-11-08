@@ -24,5 +24,14 @@ def load_configs(cfgs: List[str] = None):
     for cfg in cfgs:
         conf = OmegaConf.load(cfg)
         merged_conf = OmegaConf.merge(merged_conf, conf)
+
+    # --- Only update data_root to an absolute path ---
+    if "paths" in merged_conf and "data_root" in merged_conf.paths:
+        data_root = merged_conf.paths.data_root
+        # print(repo_root, data_root)
+        if not os.path.isabs(data_root):
+            merged_conf.paths.data_root = os.path.abspath(
+                os.path.join(repo_root, data_root)
+            )
     
     return merged_conf

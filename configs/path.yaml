@@ -1,7 +1,7 @@
-path:
+paths:
 
-  data_root: "../data/"
+  data_root: "data/" # Assuming the root is the project
   
-  synthetic: "${data_root}/synthetic/"
-  real: "${data_root}/real/"
+  synthetic: "${paths.data_root}/synthetic/"
+  real: "${paths.data_root}/real/"
     
