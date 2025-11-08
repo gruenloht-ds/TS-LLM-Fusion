@@ -3,8 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Jupyter Notebook checkpoints
+# Jupyter Notebook and checkpoints
 .ipynb_checkpoints/
+*.ipynb
 
 # Editable installs / package metadata
 *.egg-info/
