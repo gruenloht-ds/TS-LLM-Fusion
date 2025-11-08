@@ -27,10 +27,14 @@ Thumbs.db
 # Logs
 *.log
 
-# Data outputs (optional, if you don't want to track large outputs)
+# Data outputs
 results/
-data/real/
-data/synthetic/
+data/real/*.csv
+data/synthetic/*.csv
+
+# But keep a placeholder file so the folders stay in Git
+!data/real/.gitkeep
+!data/synthetic/.gitkeep
 
 # Coverage reports
 htmlcov/
