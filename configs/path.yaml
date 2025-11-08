@@ -1,0 +1,7 @@
+path:
+
+  data_root: "../data/"
+  
+  synthetic: "${data_root}/synthetic/"
+  real: "${data_root}/real/"
+    

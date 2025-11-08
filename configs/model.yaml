@@ -1,0 +1,6 @@
+model:
+  tslm:
+    learning_rate: 0.0001
+
+  llm_ps: 
+    learning_rate: 0.001
