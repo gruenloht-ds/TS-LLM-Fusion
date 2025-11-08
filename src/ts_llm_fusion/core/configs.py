@@ -7,7 +7,7 @@ def load_configs(cfgs: List[str] = None):
     Merge a list of YAML files into a single OmegaConf object.
 
     Args:
-        yaml_files (List[str]): List of paths to YAML files.
+        cfgs (List[str]): List of paths to YAML files.
 
     Returns:
         OmegaConf: Merged configuration object.
