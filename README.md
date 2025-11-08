@@ -29,7 +29,6 @@ TS-LLM-Fusion/
 ├── results              # results from runs or experiments
 ├── setup.py
 └── src                  # code to build out this project, dataloaders, architecutres, data generation/pulling
-    ├── README.md
     └── ts_llm_fusion
         ├── core         # loading configs, saving logs
         ├── data         # code for getting the data
