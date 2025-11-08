@@ -27,6 +27,7 @@ TS-LLM-Fusion/
 ├── models               # store trained models
 ├── notebooks            # code for testing
 ├── results              # results from runs or experiments
+├── examples             # examples of how to run submodles built in this project
 ├── setup.py
 └── src                  # code to build out this project, dataloaders, architecutres, data generation/pulling
     └── ts_llm_fusion
