@@ -66,5 +66,5 @@ pip install -e .
 ### Download Datasets
 
 ```bash
-wget ...
+python scripts/data/download_data.py
 ```
