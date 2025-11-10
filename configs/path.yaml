@@ -1,7 +1,9 @@
 paths:
 
   data_root: "data/" # Assuming the root is the project
-  
+
+  download_datasets: "${paths.data_root}/../extras/datasets.txt"
+
   synthetic: "${paths.data_root}/synthetic/"
   real: "${paths.data_root}/real/"
-    
+
