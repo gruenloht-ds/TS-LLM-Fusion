@@ -28,7 +28,8 @@ TS-LLM-Fusion/
 ├── notebooks            # code for testing
 ├── results              # results from runs or experiments
 ├── examples             # examples of how to run submodles built in this project
-├── setup.py
+├── extras               # extra material for this project - path to datasets, dataset citations
+├── scripts              # scripts to run - download data, train, evaluate, graph, ...
 └── src                  # code to build out this project, dataloaders, architecutres, data generation/pulling
     └── ts_llm_fusion
         ├── core         # loading configs, saving logs
