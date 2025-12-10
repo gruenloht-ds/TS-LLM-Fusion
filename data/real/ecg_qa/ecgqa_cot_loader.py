@@ -21,8 +21,8 @@ import zipfile
 import tempfile
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from time_series_datasets.constants import RAW_DATA as RAW_DATA_PATH
-from time_series_datasets.ecg_qa.ecgqa_loader import (
+from src.ts_llm_fusion.data.constants import RAW_DATA as RAW_DATA_PATH
+from data.real.ecg_qa.ecgqa_loader import (
     load_ecg_qa_ptbxl_splits, 
     download_ecg_qa_if_not_exists,
     download_ptbxl_if_not_exists

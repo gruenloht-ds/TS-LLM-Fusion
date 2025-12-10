@@ -28,7 +28,7 @@ _NVML_AVAILABLE = True
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 if REPO_DIR not in sys.path:
     sys.path.append(REPO_DIR)
-SRC_DIR = os.path.join(REPO_DIR, "src")
+SRC_DIR = os.path.join(REPO_DIR, "../../OpenTSLM/src")
 if SRC_DIR not in sys.path:
     sys.path.append(SRC_DIR)
 

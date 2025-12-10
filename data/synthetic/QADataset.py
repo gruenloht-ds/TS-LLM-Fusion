@@ -12,9 +12,9 @@ from typing import Callable, List, Literal, Tuple
 
 import numpy as np
 import sys
-from prompt.prompt_with_answer import PromptWithAnswer
-from prompt.text_prompt import TextPrompt
-from prompt.text_time_series_prompt import TextTimeSeriesPrompt
+from src.ts_llm_fusion.utils.prompt.prompt_with_answer import PromptWithAnswer
+from src.ts_llm_fusion.utils.prompt.text_prompt import TextPrompt
+from src.ts_llm_fusion.utils.prompt.text_time_series_prompt import TextTimeSeriesPrompt
 from torch.utils.data import Dataset
 
 
@@ -24,8 +24,7 @@ class QADataset(Dataset, ABC):
         split: Literal["train", "test", "validation"],
         EOS_TOKEN: str,
         format_sample_str: bool = False,
-        time_series_format_function: Callable[[np.ndarray], str] | None = None,
-    ):
+        time_series_format_function = None):
         """
         Initializes the dataset by loading and formatting the specified data split.
         Args:
@@ -59,14 +58,14 @@ class QADataset(Dataset, ABC):
 
             self.__class__.loaded = True
 
-        match split:
-            case "train":
+
+        if split == "train":
                 self.dataset = self.__class__._train_dataset
-            case "validation":
+        elif split == "validation":
                 self.dataset = self.__class__._validation_dataset
-            case "test":
+        elif split == "test":
                 self.dataset = self.__class__._test_dataset
-            case _:
+        elif split == '_':
                 raise RuntimeError(
                     "Split must be a literal of 'train', 'training', or 'validation'"
                 )
@@ -104,7 +103,7 @@ class QADataset(Dataset, ABC):
         ).to_dict()
 
     def _format_sample_str(
-        self, time_series_format_function: Callable[[np.ndarray], str] | None, row
+        self, time_series_format_function: None, row
     ):
         def fallback_timeseries_formatter(time_series: np.ndarray) -> str:
             # Fallback formatter for time series data

@@ -23,7 +23,7 @@ Usage:
 import sys
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', "src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../OpenTSLM', "src"))
 def test_ecgqa_loader():
     """Test the ECG-QA loader functions."""
     print("Testing ECG-QA loader...")

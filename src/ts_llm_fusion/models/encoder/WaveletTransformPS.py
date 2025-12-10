@@ -13,17 +13,37 @@ import torch.nn as nn
 from src.ts_llm_fusion.utils.model_config import TRANSFORMER_INPUT_DIM, ENCODER_OUTPUT_DIM, PATCH_SIZE
 from src.ts_llm_fusion.models.encoder.TimeSeriesEncoderBase import TimeSeriesEncoderBase
 
+# class WaveletMultiScaleEncoder(TimeSeriesEncoderBase):
+#     def __init__(
+#             self,
+#             output_dim: int = ENCODER_OUTPUT_DIM,
+#             dropout: float = 0.0,
+#             transformer_input_dim: int = TRANSFORMER_INPUT_DIM,
+#             patch_size: int = PATCH_SIZE,
+#             max_patches: int = 2600,
+#             ):
+#         super().__init__(output_dim,dropout)
+#         # Multi-scale CNN + inverse wavelet modules here
+#
+#         self.patch_embed = nn.Conv1d(
+#                 in_channels=1,
+#                 out_channels=transformer_input_dim,
+#                 kernel_size=patch_size,
+#                 stride=patch_size,
+#                 bias=False)
+#
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         # x shape: [B, M, L]
+#         # returns: [B, N, 128]
 
-class TransformerCNNEncoder(TimeSeriesEncoderBase):
+
+class CNNTokenizer(TimeSeriesEncoderBase):
     def __init__(
         self,
         output_dim: int = ENCODER_OUTPUT_DIM,
         dropout: float = 0.0,
         transformer_input_dim: int = TRANSFORMER_INPUT_DIM,
-        num_heads: int = 8,
-        num_layers: int = 6,
         patch_size: int = PATCH_SIZE,
-        ff_dim: int = 1024,
         max_patches: int = 2600,
     ):
         """
@@ -56,17 +76,6 @@ class TransformerCNNEncoder(TimeSeriesEncoderBase):
         # 3) Input norm + dropout
         self.input_norm = nn.LayerNorm(transformer_input_dim)
         self.input_dropout = nn.Dropout(self.dropout)
-
-        # 4) Stack of TransformerEncoder layers with higher ff_dim
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=transformer_input_dim,
-            nhead=num_heads,
-            dim_feedforward=ff_dim,
-            dropout=self.dropout,
-            batch_first=True,
-            activation="gelu",
-        )
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -103,8 +112,5 @@ class TransformerCNNEncoder(TimeSeriesEncoderBase):
         # norm + dropout
         x = self.input_norm(x)
         x = self.input_dropout(x)
-
-        # apply Transformer encoder
-        x = self.encoder(x)
 
         return x

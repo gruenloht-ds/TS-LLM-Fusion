@@ -148,7 +148,7 @@ def generate_ecg_plot(time_series: List[List[float]]) -> str:
     plt.tight_layout()
     # Save plot to disk instead of showing it
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    results_dir = os.path.join(current_dir, "..", "results", "baseline", "plots")
+    results_dir = os.path.join(current_dir, "../../../OpenTSLM/evaluation", "results", "baseline", "plots")
     os.makedirs(results_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     filename = f"ecg_plot_{timestamp}.png"

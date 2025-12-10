@@ -8,11 +8,83 @@
 
 import torch
 import torch.nn as nn
+from einops import rearrange
+
+from src.ts_llm_fusion.utils.model_config import TRANSFORMER_INPUT_DIM, ENCODER_OUTPUT_DIM, PATCH_SIZE
+from src.ts_llm_fusion.models.encoder.TimeSeriesEncoderBase import TimeSeriesEncoderBase
+from src.ts_llm_fusion.models.encoder.ResNetBlock import WT_series_decomp
+class WaveletTokenizer(TimeSeriesEncoderBase):
+    def __init__(self,
+                 output_dim: int = ENCODER_OUTPUT_DIM,
+                 dropout: float = 0.0,
+                 transformer_input_dim: int = TRANSFORMER_INPUT_DIM,
+                 ):
+        """
+
+        Args:
+            output_dim:
+            dropout:
+            transformer_input_dim:
+
+        """
+        super().__init__(output_dim, dropout)
+        self.gelu = nn.GELU()
+        self.dropout = nn.Dropout(0.3)
+
+        # 1) Conv1d patch embedding: (B, 1, L) -> (B, embed_dim, L)
+        self.conv1 = nn.Conv1d(
+            in_channels=1,
+            out_channels=transformer_input_dim,
+            kernel_size=1,
+            stride=1,
+            bias=False,
+        )
+
+        # 2) Wavelet Series Decomposition
+        self.decomposition = WT_series_decomp()
+        self.conv2 = nn.Conv1d(int(transformer_input_dim/4), 128, kernel_size=3, stride=1,padding=1,bias=False)
+
+        self.pool = nn.AvgPool1d(kernel_size=4, stride=4)
+        # 3) Input norm + dropout
+        self.input_norm = nn.LayerNorm(transformer_input_dim)
+        self.input_dropout = nn.Dropout(0.3)
+    def forward(self, x):
+
+        x = x.unsqueeze(1)
+        residual = x
+
+        x = self.gelu(self.conv1(x))
+        x = self.dropout(x)
+        splits = torch.split(x, int(x.shape[1]/4), dim=1)
+        out = [splits[0]]
+        #out = out.unsqueeze(1)
+
+        x_season, x_trend = [], []
+        for out_i in out:
+            season, trend = self.decomposition(out_i)
+            x_season.append(season)
+            x_trend.append(trend)
+        for i in range(1, len(x_season)):
+            x_season[i] = x_season[i] + x_season[i - 1]
+        for i in range(1, len(x_trend)):
+            x_trend[i] = x_trend[i] + x_trend[i - 1]
+        for i in range(len(out)):
+            out[i] = x_season[i] + x_trend[i]
+        out = torch.cat(out,dim=1)
+        out = self.conv2(out)
+        out += residual
 
 
-from model_config import TRANSFORMER_INPUT_DIM, ENCODER_OUTPUT_DIM, PATCH_SIZE
-from model.encoder.TimeSeriesEncoderBase import TimeSeriesEncoderBase
+        out = out.squeeze(2)
+        out = self.pool(out)
 
+
+        # GELU + dropout
+        out = self.gelu(out)
+        out = self.dropout(out)
+        out = torch.transpose(out,1,2)
+
+        return out
 
 class CNNTokenizer(TimeSeriesEncoderBase):
     def __init__(

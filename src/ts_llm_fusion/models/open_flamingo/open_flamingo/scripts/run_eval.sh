@@ -22,7 +22,7 @@ echo go $COUNT_NODE
 echo $HOSTNAMES
 
 export PYTHONPATH="$PYTHONPATH:open_flamingo"
-srun --cpu_bind=v --accel-bind=gn python open_flamingo/open_flamingo/eval/evaluate.py \
+srun --cpu_bind=v --accel-bind=gn python new/new/eval/evaluate.py \
     --vision_encoder_path ViT-L-14 \
     --vision_encoder_pretrained openai\
     --lm_path anas-awadalla/mpt-1b-redpajama-200b \

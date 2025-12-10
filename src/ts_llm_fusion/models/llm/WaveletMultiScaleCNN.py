@@ -3,9 +3,9 @@
 
 from einops import rearrange
 from types import SimpleNamespace
+import inspect
 from src.ts_llm_fusion.models.encoder.CNNTokenizer import CNNTokenizer
 #from src.ts_llm_fusion.models.encoder.WaveletTransformPS import WaveletMultiScaleEncoder
-from src.ts_llm_fusion.models.encoder.MultiScaleTransformer import TSFormer
 
 from src.ts_llm_fusion.models.llm.TimeSeriesFlamingoWithTrainableEncoder import (
     TimeSeriesFlamingoWithTrainableEncoder,
@@ -99,10 +99,9 @@ class WaveletMultiScaleCNN(TimeSeriesLLM):
         self.in_layer = ConvLinear(len_sequence, hidden_dim1, 1)
         self.out_layer = nn.Linear(hidden_dim2 * hidden_dim1, lang_encoder.config.hidden_size)
 
-        self.time_series_encoder = TSFormer(self, patch_size=patch_size, in_channels=1, embed_dim=hidden_dim1,
+        self.time_series_encoder = TSFormer(patch_size=patch_size, in_channel=1, embed_dim=hidden_dim1,
                                        num_heads=4, mlp_ratio=4, dropout=0.1, num_token=4032 / patch_size,
-                                       mask_ratio=-0.75, encoder_depth=4, decoder_depth=1, stage='forecasting',
-                                       embed_path='your_model_path/clean_word_embeddings.pt')
+                                       mask_ratio=-0.75, encoder_depth=4, decoder_depth=1, stage='forecasting')
         #time_series_encoder_path = configs.ts_encoder_path
         #word_embedding = torch.tensor(torch.load('your_model_path/clean_word_embeddings.pt')).to(device=device)
         #related_words = torch.load('your_model_path/clean_related_words.pt')

@@ -11,7 +11,7 @@ export MASTER_PORT=15000
 export COUNT_NODE=`scontrol show hostnames "$SLURM_JOB_NODELIST" | wc -l`
 
 export PYTHONPATH="$PYTHONPATH:open_flamingo"
-srun --cpu_bind=v --accel-bind=gn python open_flamingo/open_flamingo/train/train.py \
+srun --cpu_bind=v --accel-bind=gn python new/new/train/train.py \
     --lm_path anas-awadalla/mpt-1b-redpajama-200b \
     --tokenizer_path anas-awadalla/mpt-1b-redpajama-200b \
     --cross_attn_every_n_layers 1 \

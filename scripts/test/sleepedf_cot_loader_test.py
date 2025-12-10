@@ -14,7 +14,7 @@ Test script for the SleepEDF CoT loader.
 import unittest
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', "src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../OpenTSLM', "src"))
 
 from time_series_datasets.sleep.sleepedf_cot_loader import load_sleepedf_cot_splits, get_label_distribution
 

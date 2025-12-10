@@ -20,9 +20,9 @@ except ImportError:
         "Please install it with: pip install wfdb"
     )
 
-from prompt.text_time_series_prompt import TextTimeSeriesPrompt
-from time_series_datasets.QADataset import QADataset
-from time_series_datasets.ecg_qa.ecgqa_loader import (
+from src.ts_llm_fusion.utils.prompt.text_time_series_prompt import TextTimeSeriesPrompt
+from data.synthetic.QADataset import QADataset
+from data.real.ecg_qa.ecgqa_loader import (
     load_ecg_qa_ptbxl_splits,
     load_ecg_qa_answers,
 )

@@ -11,13 +11,13 @@ from typing import List, Tuple, Literal
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from prompt.text_time_series_prompt import TextTimeSeriesPrompt
-from time_series_datasets.QADataset import QADataset
-from time_series_datasets.har_cot.har_cot_loader import load_har_cot_splits
+from src.ts_llm_fusion.utils.prompt.text_time_series_prompt import TextTimeSeriesPrompt
+from data.synthetic.QADataset import QADataset
+from data.real.har_cot.har_cot_loader import load_har_cot_splits
 import torch
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
-from time_series_datasets.util import (
+from src.ts_llm_fusion.data.util import (
     extend_time_series_to_match_patch_size_and_aggregate,
 )
 import numpy as np

@@ -14,7 +14,7 @@ Test script for the HAR CoT loader and dataset.
 import unittest
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', "src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../OpenTSLM', "src"))
 
 # Import and set up global logger with verbose mode
 from logger import get_logger, set_global_verbose

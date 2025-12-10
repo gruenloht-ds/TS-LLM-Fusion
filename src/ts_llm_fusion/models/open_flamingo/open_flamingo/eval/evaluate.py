@@ -31,7 +31,6 @@ from classification_utils import (
 from eval_model import BaseEvalModel
 
 from ok_vqa_utils import postprocess_ok_vqa_generation
-from open_flamingo.src.flamingo import Flamingo
 from vqa_metric import compute_vqa_accuracy, postprocess_vqa_generation
 
 from open_flamingo.train.distributed import init_distributed_device, world_info_from_env
@@ -42,7 +41,7 @@ parser.add_argument(
     "--model",
     type=str,
     help="Model name. Currently only `OpenFlamingo` is supported.",
-    default="open_flamingo",
+    default="new",
 )
 parser.add_argument(
     "--results_file", type=str, default=None, help="JSON file to save results"
@@ -392,7 +391,7 @@ parser.add_argument(
 
 def main():
     args, leftovers = parser.parse_known_args()
-    module = importlib.import_module(f"open_flamingo.eval.models.{args.model}")
+    module = importlib.import_module(f"new.eval.models.{args.model}")
 
     model_args = {
         leftovers[i].lstrip("-"): leftovers[i + 1] for i in range(0, len(leftovers), 2)
@@ -405,8 +404,8 @@ def main():
     eval_model.set_device(device_id)
     eval_model.init_distributed()
 
-    if args.model != "open_flamingo" and args.shots != [0]:
-        raise ValueError("Only 0 shot eval is supported for non-open_flamingo models")
+    if args.model != "new" and args.shots != [0]:
+        raise ValueError("Only 0 shot eval is supported for non-new models")
 
     if len(args.trial_seeds) != args.num_trials:
         raise ValueError("Number of trial seeds must be == number of trials.")
@@ -1139,7 +1138,7 @@ def evaluate_classification(
     Returns:
         float: accuracy score
     """
-    if args.model != "open_flamingo":
+    if args.model != "new":
         raise NotImplementedError(
             "evaluate_classification is currently only supported for OpenFlamingo"
         )

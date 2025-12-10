@@ -18,7 +18,7 @@ from collections import Counter
 from tqdm import tqdm
 
 # Add the src directory to the path to import from the dataset class
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../OpenTSLM/evaluation", ".."))
 sys.path.append(os.path.join(project_root, "src"))
 
 # Import the dataset class to get labels

@@ -9,18 +9,18 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../OpenTSLM/src")))
 
 import json
 import os as _os
 import argparse
 from typing import List, Optional, Dict, Any, Callable
-from time_series_datasets.TSQADataset import TSQADataset
-from time_series_datasets.m4.M4QADataset import M4QADataset
-from time_series_datasets.sleep.SleepEDFCoTQADataset import SleepEDFCoTQADataset
-from time_series_datasets.har_cot.HARCoTQADataset import HARCoTQADataset
-from time_series_datasets.ecg_qa.ECGQACoTQADataset import ECGQACoTQADataset
-from time_series_datasets.util import (
+from data.synthetic.TSQADataset import TSQADataset
+from data.real.m4.M4QADataset import M4QADataset
+from data.real.sleep.SleepEDFCoTQADataset import SleepEDFCoTQADataset
+from data.real.har_cot.HARCoTQADataset import HARCoTQADataset
+from data.real.ecg_qa.ECGQACoTQADataset import ECGQACoTQADataset
+from src.ts_llm_fusion.data.util import (
     extend_time_series_to_match_patch_size_and_aggregate,
 )
 import torch
@@ -42,14 +42,15 @@ from torch.distributed.fsdp import (
 from tqdm.auto import tqdm
 from transformers import get_linear_schedule_with_warmup
 
-from model.encoder.TransformerCNNEncoder import TransformerCNNEncoder
-from model.llm.OpenTSLMFlamingo import OpenTSLMFlamingo
-from model.llm.OpenTSLMSP import OpenTSLMSP
-from model.projector.MLPProjector import MLPProjector
+from src.ts_llm_fusion.models.encoder.TransformerCNNEncoder import TransformerCNNEncoder
+from src.ts_llm_fusion.models.llm.OpenTSLMFlamingo import OpenTSLMFlamingo, WaveletOpenTSLMFlamingo
+from src.ts_llm_fusion.models.llm.OpenTSLMSP import OpenTSLMSP
+from src.ts_llm_fusion.models.llm.WaveletMultiScaleCNN import WaveletMultiScaleCNN
+from src.ts_llm_fusion.models.projector.MLPProjector import MLPProjector
 import datetime
-from logger import get_logger, set_global_verbose
+from src.ts_llm_fusion.data.logger import get_logger, set_global_verbose
 
-from model_config import (
+from src.ts_llm_fusion.utils.model_config import (
     BATCH_SIZE,
     EARLY_STOP_PAT,
     GRAD_CLIP_NORM,
@@ -174,6 +175,27 @@ class CurriculumTrainer:
                 llm_id=self.llm_id,
                 device=self.device,
             ).to(self.device)
+            print('Model: ',model)
+        elif self.model_type == 'WaveletOpenTSLMFlamingo':
+            model = WaveletOpenTSLMFlamingo(
+                cross_attn_every_n_layers=1,
+                gradient_checkpointing=self.gradient_checkpointing,
+                llm_id=self.llm_id,
+                device=self.device,
+            ).to(self.device)
+        elif self.model_type == 'WaveletMultiScale':
+            self.num_features = 3
+            self.len_sequence = 128
+            self.hidden_dim1 = 128
+            self.hidden_dim2 = 128
+            self.num_llm_layers = 32
+            model = WaveletMultiScaleCNN(
+                self.num_features,
+                self.len_sequence,
+                self.hidden_dim1,
+                self.hidden_dim2,
+                self.num_llm_layers).to(self.device)
+            print('Model: ',model)
         else:
             raise ValueError(f"Unknown model type: {self.model_type}")
 
@@ -938,36 +960,37 @@ class CurriculumTrainer:
             )
 
         # Load previous stage model and display metrics
-        try:
-            previous_stage_info = self._load_previous_stage_model(stage_name)
-            if previous_stage_info:
-                if self.rank == 0:
-                    print(f"📂 Loading best model from {previous_stage_info['stage']}:")
-                    print(f"   Achieved at epoch: {previous_stage_info['epoch']}")
-                    val_loss = previous_stage_info["val_loss"]
-                    if isinstance(val_loss, (int, float)):
-                        print(f"   Validation loss: {val_loss:.4f}")
-                    else:
-                        print(f"   Validation loss: {val_loss}")
-                    for metric, value in previous_stage_info["metrics"].items():
-                        if isinstance(value, (int, float)):
-                            print(f"   {metric}: {value:.4f}")
-                        else:
-                            print(f"   {metric}: {value}")
-                    print()
-            else:
-                # Only allow fresh model for first stage
-                if stage_name != CURRICULUM_STAGES[0]:
-                    raise RuntimeError(
-                        f"Cannot start {stage_name} with fresh model. Previous stage {CURRICULUM_STAGES[CURRICULUM_STAGES.index(stage_name) - 1]} must be completed first."
-                    )
-                if self.rank == 0:
-                    print("🆕 Starting with fresh model (first stage)")
-                    print()
-        except Exception as e:
-            if self.rank == 0:
-                print(f"❌ Error loading previous stage: {e}")
-            raise Exception(f"Error loading previous stage: {e}")
+        #try:
+        #    previous_stage_info = self._load_previous_stage_model(stage_name)
+        #    if previous_stage_info:
+        #        if self.rank == 0:
+        #            print(f"📂 Loading best model from {previous_stage_info['stage']}:")
+        #            print(f"   Achieved at epoch: {previous_stage_info['epoch']}")
+        #            val_loss = previous_stage_info["val_loss"]
+        #            if isinstance(val_loss, (int, float)):
+        #                print(f"   Validation loss: {val_loss:.4f}")
+        #            else:
+        #                print(f"   Validation loss: {val_loss}")
+        #            for metric, value in previous_stage_info["metrics"].items():
+        #                if isinstance(value, (int, float)):
+        #                    print(f"   {metric}: {value:.4f}")
+        #                else:
+        #                    print(f"   {metric}: {value}")
+        #            print()
+        #    else:
+        #        # Only allow fresh model for first stage
+        #        if stage_name != CURRICULUM_STAGES[0]:
+        #            r = 5 + 3 # Remember to uncomment below
+        #            #raise RuntimeError(
+        #            #    f"Cannot start {stage_name} with fresh model. Previous stage {CURRICULUM_STAGES[CURRICULUM_STAGES.index(stage_name) - 1]} must be completed first."
+        #            #)
+        #        if self.rank == 0:
+        #            print("🆕 Starting with fresh model (first stage)")
+        #            print()
+        #except Exception as e:
+        #    if self.rank == 0:
+        #        print(f"❌ Error loading previous stage: {e}")
+        #    raise Exception(f"Error loading previous stage: {e}")
 
         # Check if evaluation was already completed
         evaluation_completed = self._is_evaluation_completed(stage_name)
@@ -1255,7 +1278,7 @@ class CurriculumTrainer:
             stage_name="stage1_mcq",
             dataset_class=TSQADataset,
             num_epochs=30,
-            lr_encoder=2e-4,
+            lr_encoder=2e-6,
             lr_projector=1e-4,
             lr_base=2e-4,
             metric_func=lambda preds, golds: {
@@ -1280,7 +1303,7 @@ class CurriculumTrainer:
             stage_name="stage2_captioning",
             dataset_class=M4QADataset,
             num_epochs=20,
-            lr_encoder=2e-4,
+            lr_encoder=2e-6,
             lr_projector=1e-4,
             lr_base=2e-4,
             metric_func=None,  # Only test loss for captioning
@@ -1685,7 +1708,7 @@ def main():
     parser.add_argument(
         "--model",
         type=str,
-        choices=["OpenTSLMSP", "OpenTSLMFlamingo"],
+        choices=["OpenTSLMSP", "OpenTSLMFlamingo","WaveletMultiScale","WaveletOpenTSLMFlamingo"],
         required=True,
         help="Model type to train",
     )
@@ -1756,6 +1779,10 @@ def main():
     set_global_verbose(args.verbose)
     logger = get_logger(verbose=args.verbose)
 
+    device_id = torch.cuda.current_device()
+    print('CUDA Device ID: ',device_id)
+    print('CUDA Device: ', torch.cuda.get_device_name(device_id))
+
     # Initialize trainer
     trainer = CurriculumTrainer(
         args.model,
@@ -1766,6 +1793,7 @@ def main():
         local_rank=args.local_rank,
         llm_id=args.llm_id,
     )
+
 
     # Run curriculum
     results = trainer.run_curriculum(args.stages, args.batch_size, args.eval_only)

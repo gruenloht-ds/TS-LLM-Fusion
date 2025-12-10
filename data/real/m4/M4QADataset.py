@@ -19,9 +19,9 @@ from typing import List, Literal, Tuple
 import torch
 from datasets import Dataset
 
-from prompt.text_time_series_prompt import TextTimeSeriesPrompt
-from time_series_datasets.QADataset import QADataset
-from time_series_datasets.m4.m4_loader import load_all_m4_data, create_combined_dataset
+from src.ts_llm_fusion.utils.prompt.text_time_series_prompt import TextTimeSeriesPrompt
+from data.synthetic.QADataset import QADataset
+from data.real.m4.m4_loader import load_all_m4_data, create_combined_dataset
 
 
 class M4QADataset(QADataset):

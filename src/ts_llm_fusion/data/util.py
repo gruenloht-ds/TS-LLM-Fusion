@@ -8,7 +8,7 @@
 
 import math
 from typing import List
-from model_config import PATCH_SIZE
+from src.ts_llm_fusion.utils.model_config import PATCH_SIZE
 
 import torch.nn.functional as F
 

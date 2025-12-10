@@ -23,7 +23,7 @@ import pandas as pd
 
 # Add src to path
 sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "src"))
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../OpenTSLM/evaluation", "..", "src"))
 )
 
 # Import OpenAIPipeline
@@ -121,7 +121,7 @@ class CommonEvaluatorPlot(CommonEvaluator):
         import os
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        results_dir = os.path.join(current_dir, "..", "results", "baseline")
+        results_dir = os.path.join(current_dir, "../../../OpenTSLM/evaluation", "results", "baseline")
         os.makedirs(results_dir, exist_ok=True)
         df_filename = os.path.join(results_dir, "evaluation_results.csv")
         print(f"Results will be saved to: {df_filename}")

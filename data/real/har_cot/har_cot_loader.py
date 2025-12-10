@@ -15,10 +15,10 @@ import urllib.request
 import zipfile
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from time_series_datasets.constants import RAW_DATA
+from src.ts_llm_fusion.data.constants import RAW_DATA
 from tqdm.auto import tqdm
 import logging
-from logger import get_logger
+from src.ts_llm_fusion.data.logger import get_logger
 
 HAR_COT_DATA_DIR = os.path.join(RAW_DATA, "har_cot")
 HAR_COT_ZIP = os.path.join(HAR_COT_DATA_DIR, "har_cot.zip")

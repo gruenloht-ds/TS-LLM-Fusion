@@ -43,9 +43,14 @@ class TimeSeriesFlamingoWithTrainableEncoder(Flamingo):
             # Reshape to expected format for perceiver
             # The transformer output already has the "tokens" dimension we need (patches)
             vision_x = rearrange(vision_x, "(b T F) p d -> b T F p d", b=b, T=T, F=F)
-            
+
+
             # Process through perceiver
-            vision_x = self.perceiver(vision_x)
+            try:
+                vision_x = self.perceiver(vision_x)
+            except Exception as e:
+                print('Fail')
+                raise e
             
         else:
             # Original image processing path
