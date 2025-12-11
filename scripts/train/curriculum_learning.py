@@ -960,37 +960,36 @@ class CurriculumTrainer:
             )
 
         # Load previous stage model and display metrics
-        #try:
-        #    previous_stage_info = self._load_previous_stage_model(stage_name)
-        #    if previous_stage_info:
-        #        if self.rank == 0:
-        #            print(f"📂 Loading best model from {previous_stage_info['stage']}:")
-        #            print(f"   Achieved at epoch: {previous_stage_info['epoch']}")
-        #            val_loss = previous_stage_info["val_loss"]
-        #            if isinstance(val_loss, (int, float)):
-        #                print(f"   Validation loss: {val_loss:.4f}")
-        #            else:
-        #                print(f"   Validation loss: {val_loss}")
-        #            for metric, value in previous_stage_info["metrics"].items():
-        #                if isinstance(value, (int, float)):
-        #                    print(f"   {metric}: {value:.4f}")
-        #                else:
-        #                    print(f"   {metric}: {value}")
-        #            print()
-        #    else:
-        #        # Only allow fresh model for first stage
-        #        if stage_name != CURRICULUM_STAGES[0]:
-        #            r = 5 + 3 # Remember to uncomment below
-        #            #raise RuntimeError(
-        #            #    f"Cannot start {stage_name} with fresh model. Previous stage {CURRICULUM_STAGES[CURRICULUM_STAGES.index(stage_name) - 1]} must be completed first."
-        #            #)
-        #        if self.rank == 0:
-        #            print("🆕 Starting with fresh model (first stage)")
-        #            print()
-        #except Exception as e:
-        #    if self.rank == 0:
-        #        print(f"❌ Error loading previous stage: {e}")
-        #    raise Exception(f"Error loading previous stage: {e}")
+        try:
+            previous_stage_info = self._load_previous_stage_model(stage_name)
+            if previous_stage_info:
+                if self.rank == 0:
+                    print(f"📂 Loading best model from {previous_stage_info['stage']}:")
+                    print(f"   Achieved at epoch: {previous_stage_info['epoch']}")
+                    val_loss = previous_stage_info["val_loss"]
+                    if isinstance(val_loss, (int, float)):
+                        print(f"   Validation loss: {val_loss:.4f}")
+                    else:
+                        print(f"   Validation loss: {val_loss}")
+                    for metric, value in previous_stage_info["metrics"].items():
+                        if isinstance(value, (int, float)):
+                            print(f"   {metric}: {value:.4f}")
+                        else:
+                            print(f"   {metric}: {value}")
+                    print()
+            else:
+                # Only allow fresh model for first stage
+                if stage_name != CURRICULUM_STAGES[0]:
+                    raise RuntimeError(
+                        f"Cannot start {stage_name} with fresh model. Previous stage {CURRICULUM_STAGES[CURRICULUM_STAGES.index(stage_name) - 1]} must be completed first."
+                    )
+                if self.rank == 0:
+                    print("🆕 Starting with fresh model (first stage)")
+                    print()
+        except Exception as e:
+            if self.rank == 0:
+                print(f"❌ Error loading previous stage: {e}")
+            raise Exception(f"Error loading previous stage: {e}")
 
         # Check if evaluation was already completed
         evaluation_completed = self._is_evaluation_completed(stage_name)
@@ -1113,6 +1112,7 @@ class CurriculumTrainer:
             # Training loop
             epochs_no_improve = 0
             start_epoch = best_epoch + 1 if best_epoch is not None else 1
+            print('Number of epochs directly prior to epoch loop: ',num_epochs)
             for epoch in range(start_epoch, num_epochs + 1):
                 # Set epoch for distributed sampler
                 if hasattr(train_loader.sampler, "set_epoch"):
@@ -1126,6 +1126,7 @@ class CurriculumTrainer:
                     desc=f"Epoch {epoch}/{num_epochs}",
                     disable=self.rank != 0,
                 )
+                print('Length of prog: ', len(prog))
                 for i, batch in enumerate(prog):
                     # DEBUG PRINT: Only for the first batch of the first epoch
                     if epoch == start_epoch and i == 0:
@@ -1161,6 +1162,10 @@ class CurriculumTrainer:
                             loss=f"{loss.item():.4f}",
                             lr=f"{scheduler.get_last_lr()[0]:.2e}",
                         )
+
+                    #if i > 10:
+                    #    print('Sample index greater than 10')
+                    #    break
 
                 avg_train_loss = running_loss / len(train_loader)
                 if self.rank == 0:
